@@ -1,0 +1,72 @@
+services:
+
+# Traefik Reverse Proxy
+  traefik:
+    image: traefik:3.6
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    networks:
+      - OlympusConnect
+      - internal-net
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-nexus-prompt-db}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+    networks:
+      - internal-net
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:8-alpine
+    networks:
+      - internal-net
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      # Syncs your local backend folder to the container for hot-reloading
+      - ./backend:/app
+    networks:
+      - internal-net
+    depends_on:
+      - db
+      - redis
+    environment:
+      # Set the seed flag here
+      - SEED_DB=True
+    env_file:
+      - ./backend/.env
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      # Syncs your local frontend folder for hot-reloading
+      - ./frontend:/app
+      # Prevents your local node_modules from overwriting the container's linux modules
+      - /app/node_modules
+    networks:
+      - internal-net
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+
+networks:
+  internal-net:
+    driver: bridge
+  OlympusConnect:
+    external: true
