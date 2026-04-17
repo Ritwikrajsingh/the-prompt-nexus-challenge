@@ -1,0 +1,36 @@
+:host {
+  display: block;
+}
+
+/* Base skeleton block */
+.skeleton-block {
+  position: relative;
+  overflow: hidden;
+
+  /* MUCH better contrast */
+  background: var(--color-gray-200);
+}
+
+/* shimmer inside each block */
+.skeleton-block::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-gray-300),
+    transparent
+  );
+
+  transform: translateX(-100%);
+  animation: shimmer 1.2s infinite;
+}
+
+/* Animation */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}

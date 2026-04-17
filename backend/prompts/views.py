@@ -105,6 +105,7 @@ def prompt_list_create(request):
             {
                 "id": str(p.id),
                 "title": p.title,
+                "content": p.content,
                 "complexity": p.complexity,
                 "tags": [t.name for t in p.tags.all()], # Serialize tags
                 "view_count": int(count) if count else 0,
@@ -124,9 +125,9 @@ def prompt_list_create(request):
         try:
             jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
-            return JsonResponse({"error": "Token expired"}, status=401)
+            return JsonResponse({"error": "Token expired! Please login again."}, status=401)
         except jwt.InvalidTokenError:
-            return JsonResponse({"error": "Invalid token"}, status=401)
+            return JsonResponse({"error": "Invalid token! A valid barer token required."}, status=401)
 
         # 2. Create the Prompt
         try:

@@ -1,0 +1,38 @@
+<div
+  class="relative flex flex-col p-5 bg-surface rounded-xl border border-transparent shadow-sm overflow-hidden"
+>
+  <!-- HEADER -->
+  <div class="flex items-start xs:items-center justify-between xs:justify-normal gap-3 mb-3">
+    <div class="h-6 w-60 skeleton-block rounded-md"></div>
+    <div class="h-6 w-32 skeleton-block rounded-full"></div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="space-y-2 mb-4 pr-12">
+    <div class="h-3 w-11/12 skeleton-block rounded"></div>
+    <div class="h-3 w-4/5 skeleton-block rounded"></div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="border-t border-border/50"></div>
+
+  <!-- FOOTER -->
+  <div class="flex items-center justify-between mt-3">
+    <!-- TAGS -->
+    <div class="flex flex-wrap gap-2">
+      @for (_ of [1, 2]; track _) {
+        <div class="h-5 sm:h-6 w-16 skeleton-block rounded"></div>
+      }
+    </div>
+
+    <!-- DATE + VIEWS -->
+    <div class="flex items-center gap-5">
+      <div class="h-3 w-20 skeleton-block rounded"></div>
+
+      <div class="flex items-center gap-1.5">
+        <div class="h-3 w-3.5 skeleton-block rounded-full"></div>
+        <div class="h-3 w-6 skeleton-block rounded"></div>
+      </div>
+    </div>
+  </div>
+</div>
