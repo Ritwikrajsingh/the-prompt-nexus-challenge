@@ -1,0 +1,98 @@
+<a
+  routerLink="/prompts"
+  class="inline-flex items-center gap-2 text-primary hover:text-text-main transition-colors mb-7 text-sm font-semibold"
+>
+  <i class="pi pi-chevron-left text-xs"></i>
+  Go back
+</a>
+
+@if (prompt$ | async; as prompt) {
+  <div class="mb-6">
+    <div class="flex items-center gap-2 mb-3">
+      <span
+        class="inline-flex items-center gap-1.5 bg-indigo-100 text-indigo-700 text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-full"
+      >
+        <i class="pi pi-eye text-[10px]"></i>
+        {{ prompt.view_count || 0 }} views
+      </span>
+      <span
+        class="inline-flex items-center gap-1.5 bg-slate-100 text-slate-500 text-[11px] font-semibold px-3 py-1 rounded-full"
+      >
+        <i class="pi pi-calendar text-[10px]"></i>
+        {{ prompt.created_at | date: 'MMM d, yyyy' }}
+      </span>
+    </div>
+
+    <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-text-main leading-snug mb-3">
+      {{ prompt.title }}
+    </h1>
+
+    <div class="flex flex-wrap gap-2">
+      @for (tag of prompt.tags; track tag) {
+        <app-tag [tag]="tag" bg="bg-gray-200" [roundedFull]="true" />
+      }
+    </div>
+  </div>
+
+  <hr class="border-border my-5" />
+
+  <div
+    class="bg-surface rounded-xl border border-border border-l-4 border-l-primary p-5 sm:p-7 mb-4 shadow-sm"
+  >
+    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">
+      Prompt Content
+    </p>
+    <p class="text-sm text-text-main leading-relaxed whitespace-pre-wrap">
+      {{ prompt.content }}
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    @if (complexityStatus$ | async; as status) {
+      <div class="bg-surface rounded-xl border border-border p-5 shadow-sm">
+        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">
+          Reasoning Complexity
+        </p>
+
+        <div class="flex items-start justify-between mb-2">
+          <div class="text-4xl font-extrabold text-primary leading-none">
+            {{ prompt.complexity | number: '2.0-0' }}
+            <span class="text-sm font-medium text-text-muted">/ 10</span>
+          </div>
+          <span
+            class="px-3 py-1 text-[10px] font-extrabold tracking-widest uppercase rounded-full mt-1"
+            [ngClass]="status.badge"
+          >
+            {{ status.badgeText }}
+          </span>
+        </div>
+
+        <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden my-3">
+          <div
+            class="h-full bg-primary rounded-full transition-all"
+            [style.width.%]="prompt.complexity * 10"
+          ></div>
+        </div>
+
+        <p class="text-xs text-text-muted">{{ status.text }}</p>
+      </div>
+    }
+
+    <div class="bg-surface rounded-xl border border-border p-5 shadow-sm flex flex-col gap-4">
+      <div>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Prompt ID</p>
+        <p class="text-xs font-mono text-primary truncate">#{{ prompt.id }}</p>
+      </div>
+      <hr class="border-border" />
+      <div>
+        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Added</p>
+        <p class="text-sm font-semibold text-text-main">
+          {{ prompt.created_at | date: 'MMMM d, yyyy' }}
+        </p>
+        <p class="text-xs text-text-muted mt-0.5">via Prompt Nexus</p>
+      </div>
+    </div>
+  </div>
+} @else {
+  <app-prompt-detail-skeleton />
+}

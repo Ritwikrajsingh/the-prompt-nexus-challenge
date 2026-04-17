@@ -1,0 +1,45 @@
+<div
+  class="group relative flex flex-col p-5 bg-surface rounded-xl border border-transparent hover:border-border shadow-xs hover:shadow-md transition-all duration-200"
+>
+  <div class="flex items-start xs:items-center justify-between xs:justify-normal gap-3 mb-3">
+    <h3 class="text-lg sm:text-xl font-bold text-text-main">{{ prompt.title }}</h3>
+    <div class="shrink-0 mt-0.5">
+      <app-complexity-badge [complexity]="prompt.complexity"></app-complexity-badge>
+    </div>
+  </div>
+
+  <p class="text-sm text-text-muted mb-4 line-clamp-2 pr-12">
+    {{ prompt.content }}
+  </p>
+
+  <div class="border-t border-border/50"></div>
+
+  <div class="flex items-center justify-between mt-3">
+    <div class="flex flex-wrap gap-2 relative z-20">
+      @for (tag of prompt.tags.slice(0,2); track tag) {
+        <app-tag [tag]="tag" bg="bg-gray-150"></app-tag>
+      }
+    </div>
+
+    <div class="flex items-center gap-6 z-20">
+      <div class="flex items-center gap-4">
+        <span class="inline-flex items-center gap-1.5 text-text-muted text-xs font-semibold">
+          <i class="pi pi-calendar text-[10px]"></i>
+          {{ prompt.created_at | date: 'MMM d, yyyy' }}
+        </span>
+        <span
+          class="inline-flex items-center gap-1.5 text-text-muted text-xs font-bold tracking-widest"
+        >
+          <i class="pi pi-eye text-[10px]"></i>
+          {{ prompt.view_count || 0 }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <a
+    [routerLink]="['/prompts', prompt.id]"
+    class="absolute inset-0 z-10 rounded-xl"
+    aria-label="View prompt details"
+  ></a>
+</div>
