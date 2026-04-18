@@ -36,9 +36,6 @@ services:
     build: 
       context: ./backend
       dockerfile: Dockerfile
-    volumes:
-      # Syncs your local backend folder to the container for hot-reloading
-      - ./backend:/app
     networks:
       - internal-net
     depends_on:
@@ -61,11 +58,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    volumes:
-      # Syncs your local frontend folder for hot-reloading
-      - ./frontend:/app
-      # Prevents your local node_modules from overwriting the container's linux modules
-      - /app/node_modules
     networks:
       - internal-net
     depends_on:
