@@ -14,7 +14,7 @@ pipeline {
                     script {
                         sh 'cp $SECRET_ENV backend/.env'
 
-                        sh 'docker compose up -d --build'
+                        sh 'docker-compose up --build -d'
                     }
                 }
             }

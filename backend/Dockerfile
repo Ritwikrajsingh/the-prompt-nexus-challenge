@@ -18,4 +18,4 @@ RUN chmod +x /app/entrypoint.sh
 # EXPOSE 8000
 
 # Run the entrypoint script
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["bash", "/app/entrypoint.sh"]
