@@ -1,59 +1,111 @@
-# Frontend
+# Prompt Nexus - Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.0.
+The Angular client for the Prompt Nexus application assignment. It handles prompt browsing, creation, and user authentication.
 
-## Development server
+---
 
-To start a local development server, run:
+## Tech Overview
 
-```bash
-ng serve
-```
+* **Framework:** Angular 21 (Standalone Components)
+* **Styling:** Tailwind CSS v4
+* **Icons:** PrimeIcons
+* **State & Reactivity:** Angular Signals, RxJS
+* **Node Version:** v24.14.1 (enforced via `.nvmrc`)
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## Setup
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Prerequisites
 
-```bash
-ng generate component component-name
-```
+Make sure you are using the correct Node.js version.
+> If you have `nvm` installed, simply run:
+>  ```bash
+>  nvm use
+>  ```
+>  This reads the `.nvmrc` file and switches to Node v24.14.1.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Installation & Running
 
-```bash
-ng generate --help
-```
+1. **Install dependencies:**
 
-## Building
+    ```
+    npm install
+    ```
 
-To build the project run:
+2. **Run the development server:**
+    ```
+    npm run dev
+    ```
 
-```bash
-ng build
-```
+3. **Test the production build locally:**
+    ```
+    npm start
+    ```
+    > This uses the `production` environment configuration, pointing API calls to the live backend URL.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
+## Features Implemented
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+This frontend satisfies the core requirements and frontend-specific bonus challenges of the assignment:
 
-```bash
-ng test
-```
+* **Prompt List View:** Displays all prompts with title, tags, and a visual complexity badge. Includes URL-based tag filtering (`?tag=...`).
 
-## Running end-to-end tests
+* **Prompt Detail View:** Fetches and displays full prompt content along with the live `view_count` retrieved from Redis.
 
-For end-to-end (e2e) testing, run:
+* **Add Prompt Form:** A Reactive Form with strict validation:
+  * **Title**: *Minimum 3 characters.*
+  * **Content**: *Minimum 20 characters.*
+  * **Complexity**: *Range slider (1-10).*
+  * **Dynamic tag input** *(auto-formats to lowercase, removes spaces/special characters).*
 
-```bash
-ng e2e
-```
+* **Authentication (Bonus A):** Login and Registration flows. Stores JWT in `localStorage` and uses route guards to protect the creation page.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+* **Tagging System (Bonus B):** Tags are clickable across the app, updating the URL to filter the list view automatically.
 
-## Additional Resources
+---
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Code Organization & Architecture
+
+The codebase is structured to scale, following a feature-based architecture rather than grouping files by type.
+
+### Design Decisions
+
+1. **Standalone Components & Signals:**
+
+    `NgModules` are completely omitted. Components manage their own imports. Local UI state (like loading spinners or form submission status) uses Angular Signals for targeted change detection.
+
+2. **Route Guards:**
+    - **CanActivate (`auth.guard`):** Intercepts navigation to `/prompts/create`. Unauthenticated users trigger a confirmation dialog routing them to the login page.
+    - **CanDeactivate (`unsaved-changes.guard`):** Checks form controls and dynamic arrays for unsaved data, preventing accidental navigation away from draft prompts.
+
+3. **Nested Layout Routing:**
+
+    To keep the codebase DRY, global UI elements (like the navigation badge or the auth branding panel) live in layout components (`PromptsLayout`, `AuthLayout`). The router injects specific page components into these static shells using `<router-outlet>`, preventing DOM churn during navigation.
+
+4. **Graceful Error Handling:**
+
+    API calls utilize the RxJS `catchError` operator. If a user navigates to a non-existent prompt ID, the stream intercepts the `404` response, safely completes the observable with `EMPTY`, and routes the user back to the list view without breaking the UI.
+
+### Directory Structure
+
+The `src/app/` directory follows a modular, feature-driven architecture.
+
+* `core/`: Contains application-wide singletons that do not depend on UI features.
+
+  * `guards/`: Routing protection logic (`auth.guard.ts`, `unsaved-changes.guard.ts`).
+
+  * `models/`: Shared TypeScript interfaces and types (`auth.model.ts`, `prompt.model.ts`).
+
+* `features/`: The distinct business domains of the application. Each feature encapsulates its own UI and logic, making the codebase highly decoupled. The architecture of a feature is broken down into:
+
+  * `pages/`: Routable "smart" components that represent full views (e.g., `prompt-list/`, `login/`).
+
+  * `components/`: Reusable "dumb" presentation components specific to that domain (e.g., `complexity-badge/`, `error-banner/`).
+
+  * `layout/`: Structural shells that define the overarching UI for that domain, like navigation elements or branding panels (e.g., `prompts-layout.ts`).
+
+  * `services/`: Classes handling API communication and business logic for the feature (e.g., `prompt.service.ts`).
+
+  * `[feature].routes.ts`: The lazy-loaded routing configuration for that specific domain.
