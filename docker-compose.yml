@@ -51,17 +51,11 @@ services:
       - ./backend/.env
     labels:
       - "traefik.enable=true"
-      # Match the host for all paths
-      - "traefik.http.routers.nexus-be.rule=Host(`nexus-be.ritwikrajsingh.com`)"
-      - "traefik.http.services.nexus-be.loadbalancer.server.port=8000"
       - "traefik.docker.network=internal-net"
-
-      # Define the Middleware: Redirect root / to /api/
-      - "traefik.http.middlewares.be-redirect.redirectregex.regex=^https?://nexus-be.ritwikrajsingh.com/?$"
-      - "traefik.http.middlewares.be-redirect.redirectregex.replacement=https://nexus-be.ritwikrajsingh.com/api/"
-      
-      # Attach the middleware to the router
-      - "traefik.http.routers.nexus-be.middlewares=be-redirect"
+      # Catch ALL traffic sent to this domain, regardless of the path
+      - "traefik.http.routers.nexus-be.rule=Host(`nexus-be.ritwikrajsingh.com`)"
+      # Route it straight to Django's port 8000
+      - "traefik.http.services.nexus-be.loadbalancer.server.port=8000"
 
   frontend:
     build:

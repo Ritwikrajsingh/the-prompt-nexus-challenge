@@ -16,5 +16,4 @@ COPY . .
 EXPOSE 4200
 
 # Start the Angular dev server
-# --host 0.0.0.0 is required for Docker to expose the port to your local machine
 CMD ["npm", "start"]
