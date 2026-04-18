@@ -1,0 +1,55 @@
+/* You can add global styles to this file, and also import other style files */
+@import 'tailwindcss';
+@import 'primeicons/primeicons.css';
+
+@theme {
+  /* Colors - Light Enterprise Theme */
+  --color-background: #f4f7f9; /* Light grey-blue background */
+  --color-surface: #ffffff; /* Pure white cards */
+  --color-surface-hover: #f8fafc;
+
+  --color-primary: #3b82f6; /* Action blue */
+  --color-text-main: #1e293b; /* Deep slate for headings */
+  --color-text-muted: #64748b; /* Medium slate for body text */
+  --color-border: #e2e8f0; /* Light slate for borders */
+
+  /* Complexity Badge Colors - Matching Design */
+  --color-badge-bg-low: #e0e7ff; /* Light Indigo */
+  --color-badge-text-low: #4338ca;
+  --color-badge-bg-med: #dbeafe; /* Light Blue */
+  --color-badge-text-med: #1d4ed8;
+  --color-badge-bg-high: #fee2e2; /* Light Red */
+  --color-badge-text-high: #b91c1c;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+  /* Breakpoint */
+  --breakpoint-xs: 30rem;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text-main);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+    min-height: 100vh;
+  }
+}
+
+/* Custom Scrollbar for a premium feel */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}

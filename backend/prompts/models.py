@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ValidationError
 
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -21,3 +22,10 @@ class Prompt(models.Model):
 
     def __str__(self):
         return self.title
+    
+    def clean(self):        
+        if len(self.title) < 3:
+            raise ValidationError('Title must have at least 3 characters')
+        
+        if len(self.content) < 20:
+            raise ValidationError('Content must be at least 20 characters long')

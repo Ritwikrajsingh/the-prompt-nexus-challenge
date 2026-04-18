@@ -1,0 +1,92 @@
+services:
+
+# Traefik Reverse Proxy
+  traefik:
+    image: traefik:3.6
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    networks:
+      internal-net:
+      OlympusConnect:
+        aliases:
+          - traefik-prompt-nexus
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-nexus-prompt-db}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+    networks:
+      - internal-net
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:8-alpine
+    networks:
+      - internal-net
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      # Syncs your local backend folder to the container for hot-reloading
+      - ./backend:/app
+    networks:
+      - internal-net
+    depends_on:
+      - db
+      - redis
+    environment:
+      # Set the seed flag here
+      - SEED_DB=True
+    env_file:
+      - ./backend/.env
+    labels:
+      - "traefik.enable=true"
+      # Match the host for all paths
+      - "traefik.http.routers.nexus-be.rule=Host(`nexus-be.ritwikrajsingh.com`)"
+      - "traefik.http.services.nexus-be.loadbalancer.server.port=8000"
+      - "traefik.docker.network=internal-net"
+
+      # Define the Middleware: Redirect root / to /api/
+      - "traefik.http.middlewares.be-redirect.redirectregex.regex=^https?://nexus-be.ritwikrajsingh.com/?$"
+      - "traefik.http.middlewares.be-redirect.redirectregex.replacement=https://nexus-be.ritwikrajsingh.com/api/"
+      
+      # Attach the middleware to the router
+      - "traefik.http.routers.nexus-be.middlewares=be-redirect"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      # Syncs your local frontend folder for hot-reloading
+      - ./frontend:/app
+      # Prevents your local node_modules from overwriting the container's linux modules
+      - /app/node_modules
+    networks:
+      - internal-net
+    depends_on:
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nexus-fe.rule=Host(`nexus-fe.ritwikrajsingh.com`)"
+      - "traefik.http.services.nexus-fe.loadbalancer.server.port=4200"
+      - "traefik.docker.network=internal-net"
+
+volumes:
+  postgres_data:
+
+networks:
+  internal-net:
+    driver: bridge
+  OlympusConnect:
+    external: true

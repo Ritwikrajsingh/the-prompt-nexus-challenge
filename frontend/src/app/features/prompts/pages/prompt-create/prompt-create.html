@@ -1,0 +1,203 @@
+<a
+  routerLink="/prompts"
+  class="flex items-center gap-2 hover:bg-surface-hover text-gray-400 hover:text-text-main transition-colors mb-6 sm:mb-10"
+  aria-label="Back to repository"
+>
+  <i class="pi pi-chevron-left text-sm"></i>
+  <span class="text-sm font-semibold">Go back</span>
+</a>
+<div class="mb-8">
+  <h1 class="text-3xl font-bold tracking-tight text-text-main mb-2">Draft New Prompt</h1>
+  <p class="mt-2 text-sm text-text-muted max-w-2xl">
+    Structure your logic. Every prompt added here is indexed for high-density retrieval and
+    architectural consistency.
+  </p>
+</div>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div class="lg:col-span-2 space-y-6">
+    <div class="p-4 sm:p-6 bg-surface rounded-xl border border-border shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <label for="title" class="block text-xs font-bold text-gray-400 uppercase tracking-wider">
+          Prompt Title
+        </label>
+        @if (title?.invalid && title?.touched) {
+          <span class="text-[10px] font-bold text-red-500 uppercase tracking-wider">
+            Title Too Short
+          </span>
+        }
+      </div>
+
+      <input
+        id="title"
+        type="text"
+        formControlName="title"
+        placeholder="Title (min 3 chars)"
+        class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors"
+        [ngClass]="title?.invalid && title?.touched ? 'border-red-300 bg-red-50/30' : ''"
+      />
+
+      @if (title?.invalid && title?.touched) {
+        <div
+          class="flex items-center gap-2 mt-3 text-red-500"
+          [class.opacity-0]="!(title?.invalid && title?.touched)"
+        >
+          <i class="pi pi-exclamation-circle text-sm"></i>
+          <span class="text-xs font-semibold">
+            Please provide a descriptive title (at least 3 characters).
+          </span>
+        </div>
+      }
+    </div>
+
+    <div class="p-4 sm:p-6 bg-surface rounded-xl border border-border shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <label for="content" class="block text-xs font-bold text-gray-400 uppercase tracking-wider">
+          Prompt Content
+        </label>
+        @if (content?.invalid && content?.touched) {
+          <span class="text-[10px] font-bold text-red-500 uppercase tracking-wider">
+            Content Too Short
+          </span>
+        }
+      </div>
+
+      <textarea
+        id="content"
+        formControlName="content"
+        rows="12"
+        placeholder="Describe your prompt in detail (min 20 characters). Include context, intent, etc..."
+        class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-text-main resize-y focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors"
+        [ngClass]="content?.invalid && content?.touched ? 'border-red-400' : ''"
+      ></textarea>
+      @if (content?.invalid && content?.touched) {
+        <div class="flex items-center gap-2 mt-3 text-red-500">
+          <i class="pi pi-exclamation-circle text-sm"></i>
+          <span class="text-xs font-semibold"
+            >Please provide at least 20 characters for architectural depth.</span
+          >
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <div class="p-4 sm:p-6 bg-surface rounded-xl border border-border shadow-sm">
+      <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">
+        Complexity Level (1-10)
+      </label>
+
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-4xl font-extrabold text-primary">
+          {{ complexity?.value | number: '2.0-0' }}
+        </span>
+        <span
+          class="px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase rounded-full"
+          [ngClass]="complexityPillClass"
+        >
+          {{ complexityLabel }}
+        </span>
+      </div>
+
+      <input
+        type="range"
+        min="1"
+        max="10"
+        formControlName="complexity"
+        class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-2"
+      />
+
+      <div class="flex justify-between px-2 mt-2 mb-1">
+        @for (_ of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track _) {
+          <div class="h-1.5 w-0.5 bg-gray-300 rounded-full"></div>
+        }
+      </div>
+
+      <div class="flex justify-between text-[10px] font-bold text-gray-400 mt-1">
+        <span>LOWEST</span>
+        <span>HIGHEST</span>
+      </div>
+    </div>
+
+    <div class="p-4 sm:p-6 bg-surface rounded-xl border border-border shadow-sm">
+      <div class="mb-4">
+        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+          Add Tags
+        </label>
+        <p class="text-[10px] text-text-muted/90">
+          Use lowercase letters, numbers, and hyphens (e.g. <code class="font-semibold text-text-muted">api-design</code>). Press Enter to
+          add.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap gap-2 mb-4">
+        @for (tag of selectedTags; track tag) {
+          <div
+            class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full bg-gray-200 text-text-main"
+          >
+            #{{ tag }}
+            <button
+              type="button"
+              (click)="removeTag(tag)"
+              class="text-gray-500 hover:text-red-500 focus:outline-none"
+            >
+              <i class="pi pi-times text-[10px]"></i>
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="relative w-full">
+        <i class="pi pi-tag absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        <input
+          #tagInput
+          type="text"
+          placeholder="e.g. microservices-architecture"
+          class="w-full pl-11 pr-12 py-2.5 bg-gray-50 border rounded-lg text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
+          [ngClass]="tagError ? 'border-red-300 bg-red-50/30' : 'border-gray-200'"
+          (input)="onTagInput(tagInput)"
+          (keydown)="handleTagKeydown($event, tagInput)"
+        />
+        <button
+          type="button"
+          (click)="addTag(tagInput)"
+          class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-primary transition-colors focus:outline-none"
+          title="Add Tag"
+        >
+          <i class="pi pi-plus text-sm"></i>
+        </button>
+      </div>
+
+      @if (tagError) {
+        <div class="text-red-500 text-xs font-semibold mt-2 flex items-center gap-1">
+          <i class="pi pi-exclamation-circle text-[10px]"></i> {{ tagError }}
+        </div>
+      }
+    </div>
+
+    <div class="flex flex-col gap-3">
+      <button
+        type="submit"
+        [disabled]="isSubmitting()"
+        class="w-full flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-bold rounded-lg bg-primary text-white hover:opacity-80 cursor-pointer transition-colors shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
+      >
+        @if (isSubmitting()) {
+          <i class="pi pi-spin pi-spinner text-lg"></i>
+        } @else {
+          <i class="pi pi-save text-lg"></i>
+        }
+
+        {{ isSubmitting() ? 'Creating...' : 'Create Prompt' }}
+      </button>
+
+      <button
+        type="button"
+        routerLink="/prompts"
+        [disabled]="isSubmitting()"
+        class="w-full px-5 py-3 text-sm font-bold rounded-lg shadow-xs bg-surface hover:bg-gray-200 text-text-muted transition-colors disabled:opacity-50"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</form>

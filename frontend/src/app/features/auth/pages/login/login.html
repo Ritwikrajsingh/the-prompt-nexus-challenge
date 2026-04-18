@@ -1,0 +1,134 @@
+<div class="mb-8">
+  <h2 class="text-3xl font-bold tracking-tight text-text-main mb-2">Welcome Back</h2>
+  <p class="text-sm text-text-muted">Continue to your standardized repository</p>
+</div>
+
+@if (errorMessage) {
+  <app-error-banner title="Authentication Failed" [message]="errorMessage" />
+}
+
+@if (justRegistered && !errorMessage) {
+  <app-success-banner
+    title="Account Created"
+    message="Your registration was successful. Please log in."
+  />
+}
+
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+  <div>
+    <label
+      for="username"
+      class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2"
+    >
+      Username
+    </label>
+    <div class="relative">
+      <i class="pi pi-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+      <input
+        id="username"
+        type="text"
+        formControlName="username"
+        placeholder="johndoe"
+        class="w-full pl-11 pr-4 py-3 bg-gray-50 border rounded-lg text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors"
+        [ngClass]="
+          username?.invalid && username?.touched ? 'border-red-300 bg-red-50/30' : 'border-gray-200'
+        "
+        (input)="errorMessage = ''"
+      />
+    </div>
+    @if (username?.invalid && username?.touched) {
+      <div class="text-red-500 text-xs font-semibold mt-1.5 flex items-center gap-1">
+        <i class="pi pi-exclamation-circle text-[10px]"></i> Please enter your username.
+      </div>
+    }
+  </div>
+
+  <div>
+    <div class="flex items-center justify-between mb-2">
+      <label
+        for="password"
+        class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider"
+      >
+        Password
+      </label>
+
+      <!-- FOR FUTURE -->
+
+      <!-- <a
+        routerLink="/forgot-password"
+        class="text-xs font-bold text-primary hover:text-blue-700 transition-colors"
+      >
+        Forgot password?
+      </a> -->
+
+      <!-- FOR FUTURE -->
+    </div>
+    <div class="relative">
+      <i class="pi pi-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+      <input
+        id="password"
+        [type]="showPassword ? 'text' : 'password'"
+        formControlName="password"
+        placeholder="••••••••"
+        class="w-full pl-11 pr-11 py-3 bg-gray-50 border rounded-lg text-sm text-text-main focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors tracking-widest"
+        [ngClass]="
+          password?.invalid && password?.touched ? 'border-red-300 bg-red-50/30' : 'border-gray-200'
+        "
+        (input)="errorMessage = ''"
+      />
+      <button
+        type="button"
+        (click)="togglePasswordVisibility()"
+        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-text-main focus:outline-none transition-colors"
+        aria-label="Toggle password visibility"
+      >
+        <i class="pi" [ngClass]="showPassword ? 'pi-eye-slash' : 'pi-eye'"></i>
+      </button>
+    </div>
+    @if (password?.invalid && password?.touched) {
+      <div class="text-red-500 text-xs font-semibold mt-1.5 flex items-center gap-1">
+        <i class="pi pi-exclamation-circle text-[10px]"></i> Please enter a valid password.
+      </div>
+    }
+  </div>
+
+  <!-- FOR FUTURE -->
+
+  <!-- <div class="flex items-center pt-2">
+          <input
+            id="rememberMe"
+            type="checkbox"
+            formControlName="rememberMe"
+            class="w-4 h-4 text-primary bg-gray-50 border-gray-300 rounded focus:ring-primary focus:ring-2 cursor-pointer"
+            (input)="errorMessage = ''"
+          />
+          <label
+            for="rememberMe"
+            class="ml-3 text-sm font-medium text-text-muted cursor-pointer select-none"
+          >
+            Remember session for 30 days
+          </label>
+        </div> -->
+
+  <!-- FOR FUTURE -->
+
+  <button
+    type="submit"
+    [disabled]="isSubmitting()"
+    class="w-full flex items-center justify-center py-3.5 text-sm font-bold rounded-lg text-white bg-primary hover:bg-[#0047FF] transition-colors shadow-md disabled:opacity-70 disabled:cursor-not-allowed mt-2"
+  >
+    @if (isSubmitting()) {
+      <i class="pi pi-spin pi-spinner text-lg mr-2"></i>
+    }
+    {{ isSubmitting() ? 'Authenticating...' : 'Login' }}
+  </button>
+</form>
+
+<div class="mt-8 text-center text-sm text-text-muted">
+  New to the repository?
+  <a
+    routerLink="/auth/register"
+    class="font-bold text-primary hover:text-blue-700 transition-colors"
+    >Sign up</a
+  >
+</div>
