@@ -4,6 +4,12 @@ The Angular client for the Prompt Nexus application assignment. It handles promp
 
 ---
 
+### Live Links
+
+  * **Frontend URL:** [https://nexus-fe.ritwikrajsingh.com/](https://nexus-fe.ritwikrajsingh.com/)
+
+-----
+
 ## Tech Overview
 
 * **Framework:** Angular 21 (Standalone Components)
