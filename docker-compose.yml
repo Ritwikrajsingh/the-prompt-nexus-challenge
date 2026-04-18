@@ -9,8 +9,10 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
     networks:
-      - OlympusConnect
-      - internal-net
+      internal-net:
+      OlympusConnect:
+        aliases:
+          - traefik-prompt-nexus
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
@@ -47,6 +49,19 @@ services:
       - SEED_DB=True
     env_file:
       - ./backend/.env
+    labels:
+      - "traefik.enable=true"
+      # Match the host for all paths
+      - "traefik.http.routers.nexus-be.rule=Host(`nexus-be.ritwikrajsingh.com`)"
+      - "traefik.http.services.nexus-be.loadbalancer.server.port=8000"
+      - "traefik.docker.network=internal-net"
+
+      # Define the Middleware: Redirect root / to /api/
+      - "traefik.http.middlewares.be-redirect.redirectregex.regex=^https?://nexus-be.ritwikrajsingh.com/?$"
+      - "traefik.http.middlewares.be-redirect.redirectregex.replacement=https://nexus-be.ritwikrajsingh.com/api/"
+      
+      # Attach the middleware to the router
+      - "traefik.http.routers.nexus-be.middlewares=be-redirect"
 
   frontend:
     build:
@@ -61,6 +76,11 @@ services:
       - internal-net
     depends_on:
       - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nexus-fe.rule=Host(`nexus-fe.ritwikrajsingh.com`)"
+      - "traefik.http.services.nexus-fe.loadbalancer.server.port=4200"
+      - "traefik.docker.network=internal-net"
 
 volumes:
   postgres_data:
